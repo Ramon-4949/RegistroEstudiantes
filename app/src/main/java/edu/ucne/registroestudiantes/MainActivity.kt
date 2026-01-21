@@ -3,45 +3,63 @@ package edu.ucne.registroestudiantes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import edu.ucne.registroestudiantes.ui.theme.RegistroEstudiantesTheme
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import dagger.hilt.android.AndroidEntryPoint
+import edu.ucne.registroestudiantes.Presentation.Estudiantes.Edit.EditEstudianteScreen
+import edu.ucne.registroestudiantes.Presentation.Estudiantes.List.EstudianteListScreen
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            RegistroEstudiantesTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+
+                    NavHost(
+                        navController = navController,
+                        startDestination = "estudianteList"
+                    ) {
+                        // 1. PANTALLA DE LISTA
+                        composable("estudianteList") {
+                            EstudianteListScreen(
+                                onNavigateToEdit = { id ->
+                                    navController.navigate("editEstudiante/$id")
+                                },
+                                onNavigateToCreate = {
+                                    navController.navigate("editEstudiante/0")
+                                }
+                            )
+                        }
+
+
+                        composable(
+                            route = "editEstudiante/{estudianteId}",
+                            arguments = listOf(
+                                navArgument("estudianteId") { type = NavType.IntType }
+                            )
+                        ) { backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("estudianteId") ?: 0
+
+                            EditEstudianteScreen(
+                                goBack = { navController.navigateUp() }
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RegistroEstudiantesTheme {
-        Greeting("Android")
     }
 }
