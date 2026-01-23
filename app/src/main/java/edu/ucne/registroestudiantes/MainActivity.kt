@@ -3,58 +3,65 @@ package edu.ucne.registroestudiantes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.NavType
+import androidx.navigation.toRoute
 import dagger.hilt.android.AndroidEntryPoint
 import edu.ucne.registroestudiantes.Presentation.Estudiantes.Edit.EditEstudianteScreen
 import edu.ucne.registroestudiantes.Presentation.Estudiantes.List.EstudianteListScreen
+import edu.ucne.registroestudiantes.Presentation.Navigation.RegistroEstudiantesDrawer
+import edu.ucne.registroestudiantes.Presentation.Navigation.Screen
+import edu.ucne.registroestudiantes.ui.theme.RegistroEstudiantesTheme
+import kotlinx.coroutines.launch
+import edu.ucne.registroestudiantes.Presentation.Estudiantes.Asignatura.AsignaturaListScreen
+import edu.ucne.registroestudiantes.Presentation.Estudiantes.Asignatura.AsignaturaScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
+            RegistroEstudiantesTheme {
+                val navController = rememberNavController()
+                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
 
+                RegistroEstudiantesDrawer(
+                    drawerState = drawerState,
+                    onNavigate = { route ->
+                        navController.navigate(route)
+                        scope.launch { drawerState.close() }
+                    }
+                ) {
                     NavHost(
                         navController = navController,
-                        startDestination = "estudianteList"
+                        startDestination = Screen.AsignaturaList
                     ) {
-                        // 1. PANTALLA DE LISTA
-                        composable("estudianteList") {
+                        composable<Screen.EstudianteList> {
                             EstudianteListScreen(
-                                onNavigateToEdit = { id ->
-                                    navController.navigate("editEstudiante/$id")
-                                },
-                                onNavigateToCreate = {
-                                    navController.navigate("editEstudiante/0")
-                                }
+                                onNavigateToEdit = { id -> navController.navigate(Screen.Estudiante(id)) },
+                                onNavigateToCreate = { navController.navigate(Screen.Estudiante(0)) }
                             )
                         }
-
-
-                        composable(
-                            route = "editEstudiante/{estudianteId}",
-                            arguments = listOf(
-                                navArgument("estudianteId") { type = NavType.IntType }
+                        composable<Screen.Estudiante> { backStackEntry ->
+                            EditEstudianteScreen(goBack = { navController.navigateUp() })
+                        }
+                        composable<Screen.AsignaturaList> {
+                            AsignaturaListScreen(
+                                onDrawer = { scope.launch { drawerState.open() } },
+                                onCreate = { navController.navigate(Screen.Asignatura(0)) },
+                                onEdit = { id -> navController.navigate(Screen.Asignatura(id)) }
                             )
-                        ) { backStackEntry ->
-                            val id = backStackEntry.arguments?.getInt("estudianteId") ?: 0
-
-                            EditEstudianteScreen(
-                                goBack = { navController.navigateUp() }
+                        }
+                        composable<Screen.Asignatura> { backStackEntry ->
+                            val args = backStackEntry.toRoute<Screen.Asignatura>()
+                            AsignaturaScreen(
+                                asignaturaId = args.asignaturaId,
+                                onBack = { navController.navigateUp() }
                             )
                         }
                     }
