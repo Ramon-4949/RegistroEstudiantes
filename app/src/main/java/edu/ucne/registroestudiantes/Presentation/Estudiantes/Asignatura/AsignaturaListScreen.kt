@@ -1,4 +1,4 @@
-package edu.ucne.registroestudiantes.Presentation.Estudiantes.List
+package edu.ucne.registroestudiantes.Presentation.Estudiantes.Asignatura
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,25 +19,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import edu.ucne.registroestudiantes.Domain.Model.Estudiante
+import edu.ucne.registroestudiantes.Data.Local.entities.AsignaturaEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EstudianteListScreen(
-    viewModel: EstudianteListViewModel = hiltViewModel(),
+fun AsignaturaListScreen(
+    viewModel: AsignaturaListViewModel = hiltViewModel(),
     onDrawer: () -> Unit,
-    onNavigateToEdit: (Int) -> Unit,
-    onNavigateToCreate: () -> Unit
+    onCreate: () -> Unit,
+    onEdit: (Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    var showDialog by remember { mutableStateOf(false) }
-    var estudianteToDelete by remember { mutableStateOf<Estudiante?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var asignaturaToDelete by remember { mutableStateOf<AsignaturaEntity?>(null) }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Lista de Estudiantes") },
+                title = { Text("Lista de Asignaturas") },
                 navigationIcon = {
                     IconButton(onClick = onDrawer) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
@@ -46,51 +45,49 @@ fun EstudianteListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToCreate) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar")
+            FloatingActionButton(onClick = onCreate) {
+                Icon(Icons.Default.Add, contentDescription = "Crear Asignatura")
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.estudiantes) { estudiante ->
-                    EstudianteRow(
-                        estudiante = estudiante,
-                        onEdit = { onNavigateToEdit(estudiante.estudianteId) },
+                items(uiState.asignaturas) { asignatura ->
+                    AsignaturaRow(
+                        asignatura = asignatura,
+                        onEdit = { asignatura.asignaturaId?.let { onEdit(it) } },
                         onDelete = {
-                            estudianteToDelete = estudiante
-                            showDialog = true
+                            asignaturaToDelete = asignatura
+                            showDeleteDialog = true
                         }
                     )
                 }
             }
         }
 
-        if (showDialog) {
+        if (showDeleteDialog) {
             AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text("Eliminar Estudiante") },
-                text = { Text("¿Estás seguro de que deseas eliminar a ${estudianteToDelete?.nombres}?") },
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Eliminar Asignatura") },
+                text = { Text("¿Deseas eliminar la asignatura ${asignaturaToDelete?.nombre}?") },
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            estudianteToDelete?.let {
-                                viewModel.onEvent(EstudianteListUiEvent.Delete(it.estudianteId))
-                            }
-                            showDialog = false
+                            asignaturaToDelete?.let { viewModel.delete(it) }
+                            showDeleteDialog = false
                         }
-                    ) {
-                        Text("Sí, eliminar", color = MaterialTheme.colorScheme.error)
-                    }
+                    ) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text("Cancelar")
-                    }
+                    TextButton(onClick = { showDeleteDialog = false }) { Text("Cancelar") }
                 }
             )
         }
@@ -98,17 +95,14 @@ fun EstudianteListScreen(
 }
 
 @Composable
-fun EstudianteRow(
-    estudiante: Estudiante,
+fun AsignaturaRow(
+    asignatura: AsignaturaEntity,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -119,29 +113,20 @@ fun EstudianteRow(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = estudiante.nombres,
+                    text = "${asignatura.codigo} - ${asignatura.nombre}",
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${estudiante.email} | Edad: ${estudiante.edad}",
+                    text = "Aula: ${asignatura.aula} | Créditos: ${asignatura.creditos}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-
             Row {
                 IconButton(onClick = onEdit) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    Icon(Icons.Default.Edit, contentDescription = "Editar", tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Eliminar",
-                        tint = MaterialTheme.colorScheme.error
-                    )
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
                 }
             }
         }

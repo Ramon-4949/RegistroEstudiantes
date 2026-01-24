@@ -11,6 +11,9 @@ import edu.ucne.registroestudiantes.Data.BD.EstudiantesDB
 import edu.ucne.registroestudiantes.Data.Local.EstudianteDAO
 import edu.ucne.registroestudiantes.Data.Repository.EstudianteRepositoryImpl
 import edu.ucne.registroestudiantes.Domain.Repository.EstudianteRepository
+import edu.ucne.registroestudiantes.Data.Local.dao.AsignaturaDao
+import edu.ucne.registroestudiantes.Data.Repository.AsignaturaRepositoryImpl
+import edu.ucne.registroestudiantes.Domain.Repository.AsignaturaRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -25,7 +28,7 @@ object AppModule {
             EstudiantesDB::class.java,
             "Estudiantes.db"
         )
-            .fallbackToDestructiveMigration() // <--- CORREGIDO: Paréntesis vacíos
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -38,6 +41,18 @@ object AppModule {
     @Provides
     @Singleton
     fun provideEstudianteRepository(impl: EstudianteRepositoryImpl): EstudianteRepository {
+        return impl
+    }
+
+    @Provides
+    @Singleton
+    fun provideAsignaturaDAO(db: EstudiantesDB): AsignaturaDao {
+        return db.asignaturaDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAsignaturaRepository(impl: AsignaturaRepositoryImpl): AsignaturaRepository {
         return impl
     }
 }

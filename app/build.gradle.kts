@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("androidx.room") version "2.7.2" apply false
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
     id("com.google.dagger.hilt.android") version "2.57.1"
 }
 
@@ -67,6 +68,7 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:2.7.2")
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
+    implementation("androidx.compose.material:material-icons-extended")
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.57.1")
