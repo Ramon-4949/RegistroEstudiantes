@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<Screen.EstudianteList> {
                             EstudianteListScreen(
+                                onDrawer = { scope.launch { drawerState.open() } },
                                 onNavigateToEdit = { id -> navController.navigate(Screen.Estudiante(id)) },
                                 onNavigateToCreate = { navController.navigate(Screen.Estudiante(0)) }
                             )

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,9 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.ucne.registroestudiantes.Domain.Model.Estudiante
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EstudianteListScreen(
     viewModel: EstudianteListViewModel = hiltViewModel(),
+    onDrawer: () -> Unit,
     onNavigateToEdit: (Int) -> Unit,
     onNavigateToCreate: () -> Unit
 ) {
@@ -31,6 +35,16 @@ fun EstudianteListScreen(
     var estudianteToDelete by remember { mutableStateOf<Estudiante?>(null) }
 
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Lista de Estudiantes") },
+                navigationIcon = {
+                    IconButton(onClick = onDrawer) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToCreate) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar")
@@ -38,12 +52,6 @@ fun EstudianteListScreen(
         }
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            Text(
-                text = "Lista de Estudiantes",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
-            )
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),

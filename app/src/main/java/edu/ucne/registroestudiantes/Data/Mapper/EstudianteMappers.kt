@@ -9,7 +9,6 @@ fun EstudianteEntity.toDomain() = Estudiante(
     email = email,
     edad = edad
 )
-
 fun Estudiante.toEntity() = EstudianteEntity(
     estudianteId = estudianteId,
     nombres = nombres,

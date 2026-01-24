@@ -68,6 +68,7 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:2.7.2")
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
+    implementation("androidx.compose.material:material-icons-extended")
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.57.1")

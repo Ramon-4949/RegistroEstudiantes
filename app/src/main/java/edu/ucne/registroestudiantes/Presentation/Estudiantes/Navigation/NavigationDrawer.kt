@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -43,7 +43,7 @@ fun RegistroEstudiantesDrawer(
 
                 NavigationDrawerItem(
                     label = { Text("Asignaturas") },
-                    icon = { Icon(Icons.Default.List, contentDescription = null) },
+                    icon = { Icon(Icons.Filled.Book, contentDescription = "Asignaturas") },
                     selected = false,
                     onClick = {
                         onNavigate(Screen.AsignaturaList)

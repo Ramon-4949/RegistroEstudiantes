@@ -25,7 +25,7 @@ import edu.ucne.registroestudiantes.Data.Local.entities.AsignaturaEntity
 @Composable
 fun AsignaturaListScreen(
     viewModel: AsignaturaListViewModel = hiltViewModel(),
-    onDrawer: () -> Unit, // Para abrir el menú lateral
+    onDrawer: () -> Unit,
     onCreate: () -> Unit,
     onEdit: (Int) -> Unit
 ) {
