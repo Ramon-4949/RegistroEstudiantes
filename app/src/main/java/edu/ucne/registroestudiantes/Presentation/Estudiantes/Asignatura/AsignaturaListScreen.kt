@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import edu.ucne.registroestudiantes.Data.Local.entities.AsignaturaEntity
+import edu.ucne.registroestudiantes.Domain.Model.Asignatura
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +31,7 @@ fun AsignaturaListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var asignaturaToDelete by remember { mutableStateOf<AsignaturaEntity?>(null) }
+    var asignaturaToDelete by remember { mutableStateOf<Asignatura?>(null) }
 
     Scaffold(
         topBar = {
@@ -63,7 +63,7 @@ fun AsignaturaListScreen(
                 items(uiState.asignaturas) { asignatura ->
                     AsignaturaRow(
                         asignatura = asignatura,
-                        onEdit = { asignatura.asignaturaId?.let { onEdit(it) } },
+                        onEdit = { onEdit(asignatura.asignaturaId) },
                         onDelete = {
                             asignaturaToDelete = asignatura
                             showDeleteDialog = true
@@ -96,7 +96,7 @@ fun AsignaturaListScreen(
 
 @Composable
 fun AsignaturaRow(
-    asignatura: AsignaturaEntity,
+    asignatura: Asignatura,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
