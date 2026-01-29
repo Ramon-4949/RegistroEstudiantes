@@ -1,16 +1,16 @@
-package edu.ucne.registroestudiantes.Data.Local.dao
+package edu.ucne.registroestudiantes.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import edu.ucne.registroestudiantes.Data.Local.entities.AsignaturaEntity
+import edu.ucne.registroestudiantes.data.local.entities.AsignaturaEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AsignaturaDao {
     @Upsert
-    suspend fun save(asignatura: AsignaturaEntity)
+    suspend fun upsert(asignatura: AsignaturaEntity) // Renombrando de save a upsert
 
     @Delete
     suspend fun delete(asignatura: AsignaturaEntity)
