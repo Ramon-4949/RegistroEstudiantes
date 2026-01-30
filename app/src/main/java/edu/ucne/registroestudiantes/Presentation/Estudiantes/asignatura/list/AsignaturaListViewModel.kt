@@ -1,10 +1,10 @@
-package edu.ucne.registroestudiantes.Presentation.Estudiantes.Asignatura
+package edu.ucne.registroestudiantes.Presentation.estudiantes.asignatura.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.ucne.registroestudiantes.Domain.Model.Asignatura
-import edu.ucne.registroestudiantes.Domain.Repository.AsignaturaRepository
+import edu.ucne.registroestudiantes.domain.model.Asignatura
+import edu.ucne.registroestudiantes.domain.repository.AsignaturaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,13 +27,24 @@ class AsignaturaListViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        getAsignaturas()
+        onEvent(AsignaturaListUiEvent.Load)
+    }
+
+    fun onEvent(event: AsignaturaListUiEvent) {
+        when(event) {
+            is AsignaturaListUiEvent.Load -> {
+                getAsignaturas()
+            }
+            is AsignaturaListUiEvent.Delete -> {
+                delete(event.asignaturaId)
+            }
+        }
     }
 
     private fun getAsignaturas() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            repository.getAll().collectLatest { lista ->
+            repository.observeAsignaturas().collectLatest { lista ->
                 _uiState.update {
                     it.copy(
                         asignaturas = lista,
@@ -44,9 +55,9 @@ class AsignaturaListViewModel @Inject constructor(
         }
     }
 
-    fun delete(asignatura: Asignatura) {
+    private fun delete(id: Int) {
         viewModelScope.launch {
-            repository.delete(asignatura)
+            repository.delete(id)
         }
     }
 }
