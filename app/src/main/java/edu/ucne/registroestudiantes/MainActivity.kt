@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import edu.ucne.registroestudiantes.Presentation.navigation.RegistroNavHost
+import edu.ucne.registroestudiantes.presentation.navigation.RegistroNavHost
 import edu.ucne.registroestudiantes.ui.theme.RegistroEstudiantesTheme
 
 @AndroidEntryPoint
