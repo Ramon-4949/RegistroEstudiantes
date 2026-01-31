@@ -1,4 +1,4 @@
-package edu.ucne.registroestudiantes.Presentation.navigation
+package edu.ucne.registroestudiantes.presentation.navigation
 
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
@@ -7,10 +7,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import edu.ucne.registroestudiantes.Presentation.estudiantes.asignatura.list.AsignaturaListScreen
-import edu.ucne.registroestudiantes.Presentation.estudiantes.asignatura.edit.EditAsignaturaScreen
-import edu.ucne.registroestudiantes.Presentation.estudiantes.edit.EditEstudianteScreen
-import edu.ucne.registroestudiantes.Presentation.estudiantes.list.EstudianteListScreen
+import androidx.navigation.toRoute
+import edu.ucne.registroestudiantes.presentation.asignatura.list.AsignaturaListScreen
+import edu.ucne.registroestudiantes.presentation.asignatura.edit.EditAsignaturaScreen
+import edu.ucne.registroestudiantes.presentation.estudiantes.edit.EditEstudianteScreen
+import edu.ucne.registroestudiantes.presentation.estudiantes.list.EstudianteListScreen
+import edu.ucne.registroestudiantes.presentation.penalidad_tipo.edit.EditTipoPenalidadScreen
+import edu.ucne.registroestudiantes.presentation.penalidad_tipo.list.TipoPenalidadListScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,6 +57,23 @@ fun RegistroNavHost(
 
             composable<Screen.Asignatura> {
                 EditAsignaturaScreen(
+                    onBack = { navHostController.navigateUp() },
+                    onDrawer = { scope.launch { drawerState.open() } }
+                )
+            }
+
+            // --- TIPOS PENALIDADES ---
+            composable<Screen.TipoPenalidadList> {
+                TipoPenalidadListScreen(
+                    onDrawer = { scope.launch { drawerState.open() } },
+                    onCreate = { navHostController.navigate(Screen.TipoPenalidad(0)) },
+                    onEdit = { id -> navHostController.navigate(Screen.TipoPenalidad(id)) }
+                )
+            }
+
+            composable<Screen.TipoPenalidad> { backStackEntry ->
+                val args = backStackEntry.toRoute<Screen.TipoPenalidad>()
+                EditTipoPenalidadScreen(
                     onBack = { navHostController.navigateUp() },
                     onDrawer = { scope.launch { drawerState.open() } }
                 )

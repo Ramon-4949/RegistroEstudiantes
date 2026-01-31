@@ -1,4 +1,4 @@
-package edu.ucne.registroestudiantes.Presentation.navigation
+package edu.ucne.registroestudiantes.presentation.navigation
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
