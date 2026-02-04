@@ -6,4 +6,6 @@ sealed interface EditTipoPenalidadUiEvent {
     data class PuntosChanged(val puntos: String) : EditTipoPenalidadUiEvent
     data object Save : EditTipoPenalidadUiEvent
     data object Nuevo : EditTipoPenalidadUiEvent
+
+    data object OnSaved : EditTipoPenalidadUiEvent
 }

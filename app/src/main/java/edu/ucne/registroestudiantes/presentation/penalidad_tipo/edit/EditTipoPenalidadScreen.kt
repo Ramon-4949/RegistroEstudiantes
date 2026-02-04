@@ -13,9 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import edu.ucne.registroestudiantes.presentation.penalidad_tipo.edit.EditTipoPenalidadUiEvent
-import edu.ucne.registroestudiantes.presentation.penalidad_tipo.edit.EditTipoPenalidadUiState
-import edu.ucne.registroestudiantes.presentation.penalidad_tipo.edit.EditTipoPenalidadViewModel
 import edu.ucne.registroestudiantes.ui.theme.RegistroEstudiantesTheme
 
 @Composable
@@ -29,7 +26,7 @@ fun EditTipoPenalidadScreen(
     LaunchedEffect(uiState.saved) {
         if (uiState.saved) {
             onBack()
-            viewModel.onEvent(EditTipoPenalidadUiEvent.Nuevo)
+            viewModel.onEvent(EditTipoPenalidadUiEvent.OnSaved)
         }
     }
 

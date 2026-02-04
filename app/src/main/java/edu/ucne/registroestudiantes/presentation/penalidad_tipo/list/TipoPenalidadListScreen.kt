@@ -13,12 +13,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.ucne.registroestudiantes.domain.penalidad_tipo.model.TipoPenalidad
-import edu.ucne.registroestudiantes.ui.theme.RegistroEstudiantesTheme
 
 @Composable
 fun TipoPenalidadListScreen(
@@ -30,28 +28,23 @@ fun TipoPenalidadListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TipoPenalidadListBody(
-        tiposPenalidades = uiState.tiposPenalidades,
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
         onDrawer = onDrawer,
         onCreate = onCreate,
-        onEdit = onEdit,
-        onDelete = { tipo ->
-            viewModel.onEvent(TipoPenalidadListUiEvent.Delete(tipo.tipoId))
-        }
+        onEdit = onEdit
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TipoPenalidadListBody(
-    tiposPenalidades: List<TipoPenalidad>,
+    uiState: TipoPenalidadListUiState,
+    onEvent: (TipoPenalidadListUiEvent) -> Unit,
     onDrawer: () -> Unit,
     onCreate: () -> Unit,
-    onEdit: (Int) -> Unit,
-    onDelete: (TipoPenalidad) -> Unit
+    onEdit: (Int) -> Unit
 ) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var tipoToDelete by remember { mutableStateOf<TipoPenalidad?>(null) }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -75,11 +68,12 @@ fun TipoPenalidadListBody(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            if (tiposPenalidades.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.tiposPenalidades.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Default.Info,
@@ -88,10 +82,7 @@ fun TipoPenalidadListBody(
                             tint = MaterialTheme.colorScheme.secondary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No hay tipos de penalidades.",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Text("No hay tipos de penalidades.")
                     }
                 }
             } else {
@@ -99,35 +90,31 @@ fun TipoPenalidadListBody(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(tiposPenalidades) { tipo ->
+                    items(uiState.tiposPenalidades) { tipo ->
                         TipoPenalidadRow(
                             tipo = tipo,
                             onEdit = { onEdit(tipo.tipoId) },
-                            onDelete = {
-                                tipoToDelete = tipo
-                                showDeleteDialog = true
-                            }
+                            onSelectDelete = { onEvent(TipoPenalidadListUiEvent.OnSelectTipoToDelete(tipo)) }
                         )
                     }
                 }
             }
         }
 
-        if (showDeleteDialog) {
+        if (uiState.showDeleteDialog) {
             AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
+                onDismissRequest = { onEvent(TipoPenalidadListUiEvent.OnDismissDialog) },
                 title = { Text("Eliminar Tipo") },
-                text = { Text("¿Eliminar ${tipoToDelete?.nombre}?") },
+                text = { Text("¿Eliminar ${uiState.tipoToDelete?.nombre}?") },
                 confirmButton = {
                     TextButton(
-                        onClick = {
-                            tipoToDelete?.let { onDelete(it) }
-                            showDeleteDialog = false
-                        }
+                        onClick = { onEvent(TipoPenalidadListUiEvent.OnConfirmDelete) }
                     ) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) { Text("Cancelar") }
+                    TextButton(onClick = { onEvent(TipoPenalidadListUiEvent.OnDismissDialog) }) {
+                        Text("Cancelar")
+                    }
                 }
             )
         }
@@ -138,7 +125,7 @@ fun TipoPenalidadListBody(
 fun TipoPenalidadRow(
     tipo: TipoPenalidad,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onSelectDelete: () -> Unit
 ) {
     Card(
         elevation = CardDefaults.cardElevation(4.dp),
@@ -157,23 +144,9 @@ fun TipoPenalidadRow(
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = "Editar", tint = MaterialTheme.colorScheme.primary)
             }
-            IconButton(onClick = onDelete) {
+            IconButton(onClick = onSelectDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TipoPenalidadListPreview() {
-    RegistroEstudiantesTheme {
-        TipoPenalidadListBody(
-            tiposPenalidades = listOf(
-                TipoPenalidad(1, "Llegada Tardía", "5 min tarde", 10),
-                TipoPenalidad(2, "Sin Uniforme", "Sin polo", 15)
-            ),
-            onDrawer = {}, onCreate = {}, onEdit = {}, onDelete = {}
-        )
     }
 }
