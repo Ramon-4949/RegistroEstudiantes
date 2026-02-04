@@ -50,12 +50,14 @@ class EditTipoPenalidadViewModel @Inject constructor(
             is EditTipoPenalidadUiEvent.Nuevo -> {
                 _uiState.update { EditTipoPenalidadUiState() }
             }
+            is EditTipoPenalidadUiEvent.OnSaved -> {
+                _uiState.update { it.copy(saved = false) }
+            }
         }
     }
 
     private fun getTipoPenalidad(id: Int) {
         viewModelScope.launch {
-            // Usa invoke(Int)
             val tipo = getTipoPenalidadUseCase(id)
             tipo?.let {
                 _uiState.update { state ->
